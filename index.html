@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QLCA</title>
+
+<style>
+		html {
+			scrollbar-gutter: stable;
+		}
+
+		body {
+			margin: 0;
+			font-family: "Inter", sans-serif;
+			background: #fdfdfd;
+			color: #050505;
+			overflow-x: hidden;
+			overflow-y: scroll;
+		}
+
+		body.menu-open {
+			overflow: hidden;
+		}
+
+		.header {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 481px;
+			height: 51px;
+			z-index: 300;
+			display: none;
+			align-items: stretch;
+			background: #050505;
+			border-right: 1px solid #050505;
+		}
+
+		.Dropdownbutton {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) auto;
+			align-items: center;
+			width: 100%;
+			height: 100%;
+			padding: 0 28px 0 42px;
+			background: #050505;
+			color: #fdfdfd;
+			border: 0;
+			cursor: pointer;
+			box-sizing: border-box;
+		}
+
+		.Dropdownbutton:hover {
+			background: #050505;
+			color: #fdfdfd;
+		}
+
+		.menu {
+			font-size: 20px;
+			font-weight: 600;
+			line-height: 1;
+			white-space: nowrap;
+		}
+
+		body.menu-visible .header {
+    		display: flex;
+		}
+
+		.Dropdown {
+			display: inline-flex;
+			align-items: center;
+			gap: 18px;
+			font-size: 15px;
+			font-weight: 300;
+			line-height: 1;
+		}
+
+		.openMenu {
+			display: inline;
+			font-size: 15px;
+		}
+
+		.closeMenu {
+			display: none;
+			font-size: 15px;
+		}
+
+		.DropdownSymbol {
+			width: 12px;
+			font-size: 16px;
+			line-height: 1;
+			text-align: center;
+		}
+
+		.DropdownSymbol::before {
+			content: "+";
+		}
+
+		.open .openMenu {
+			display: none;
+		}
+
+		.open .closeMenu {
+			display: inline;
+		}
+
+		.open .DropdownSymbol::before {
+			content: "×";
+		}
+
+		.Chapters {
+			display: none;
+			position: fixed;
+			top: 51px;
+			bottom: 0;
+			left: 0;
+			width: 481px;
+			max-width: 100vw;
+			padding: 38px 48px 32px;
+			background: #fdfdfd;
+			border: 1px solid rgba(5, 5, 5, 0.55);
+			border-top: 0;
+			box-sizing: border-box;
+			overflow-y: auto;
+			z-index: 301;
+		}
+
+		.open .Chapters {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+		}
+
+		.menu-group {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			width: 100%;
+			padding: 0 0 34px;
+			margin: 0 0 34px;
+			border-bottom: 1px solid rgba(5, 5, 5, 0.18);
+			box-sizing: border-box;
+		}
+
+		.menu-group:last-child {
+			margin-bottom: 0;
+			padding-bottom: 0;
+			border-bottom: 0;
+		}
+
+		.Chapters a {
+			color: #050505;
+			text-decoration: none;
+		}
+
+		.group-link {
+			display: inline-flex;
+			min-height: 38px;
+			min-width: 183px;
+			align-items: center;
+			padding: 0 16px;
+			margin: 0 0 26px;
+			border: 1px solid rgba(5, 5, 5, 0.35);
+			border-radius: 2px;
+			font-size: 20px;
+			font-weight: 600;
+			line-height: 1;
+			color: rgba(5, 5, 5, 0.55);
+			background: transparent;
+		}
+
+		.group-link.is-active {
+			background: #050505;
+			border-color: #050505;
+			color: #fdfdfd;
+		}
+
+		.item-link {
+			display: inline-flex;
+			align-items: center;
+			gap: 16px;
+			margin: 0 0 14px;
+			font-size: 20px;
+			font-weight: 400;
+			line-height: 1.25;
+			color: rgba(5, 5, 5, 0.42);
+		}
+
+		.item-link:last-child {
+			margin-bottom: 0;
+		}
+
+		.item-link::before {
+			content: "";
+			width: 11px;
+			height: 11px;
+			border: 1px solid rgba(5, 5, 5, 0.34);
+			border-radius: 2px;
+			box-sizing: border-box;
+			flex: 0 0 11px;
+		}
+
+		.item-link.is-active {
+			color: #050505;
+		}
+
+		.item-link.is-active::before {
+			background: #050505;
+			border-color: #050505;
+		}
+
+		#intro.hero {
+			position: fixed;
+			inset: 0;
+			z-index: 200;
+			height: 100vh;
+			min-height: 100vh;
+			display: flex;
+			align-items: stretch;
+			padding: 28px 55px 40px;
+			box-sizing: border-box;
+			background: transparent;
+			overflow: hidden;
+			pointer-events: none;
+		}
+
+		.hero__inner {
+			position: relative;
+			z-index: 2;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			height: 100%;
+			width: 740px;
+			max-width: 100%;
+			flex: 0 0 740px;
+			opacity: var(--intro-hero-opacity, 1);
+			transition: opacity 0.24s linear;
+		}
+
+		.hero__visual-shell {
+			position: fixed;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			background: #FDFDFD;
+			overflow: hidden;
+			pointer-events: none;
+			z-index: 1;
+			transition: opacity 0.2s ease, visibility 0.2s ease;
+		}
+
+		/* Keep homepage model as full background, then restore split layout for scrolly sections. */
+		body.menu-visible .hero__visual-shell {
+			left: 481px;
+		}
+
+		body.content-active .hero__visual-shell {
+			opacity: 0;
+			visibility: hidden;
+		}
+
+		.hero__title,
+		.hero__subtitle,
+		.hero__scroll {
+			opacity: var(--intro-hero-opacity, 1);
+			transition: opacity 0.24s linear;
+		}
+
+		.hero__model-canvas {
+			position: relative;
+			width: 100%;
+			height: 100%;
+			background: transparent;
+		}
+
+		.hero__model-canvas canvas {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+
+		.hero__model-fallback {
+			display: none;
+			position: absolute;
+			left: 40px;
+			bottom: 40px;
+			max-width: 220px;
+			font-size: 15px;
+			line-height: 1.35;
+			color: rgba(5, 5, 5, 0.56);
+		}
+
+		.hero__logo,
+		.hero__title,
+		.hero__subtitle,
+		.hero__scroll {
+			color: #050505;
+		}
+
+		.hero__logo {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 100px;
+			min-height: 66px;
+			padding: 0;
+			box-sizing: border-box;
+			margin-bottom: 20vh;
+		}
+
+		.hero__logo-img {
+			display: block;
+			width: 100%;
+			height: auto;
+		}
+
+		.hero__title {
+			margin: 0 0 0 32px;
+			line-height: 0;
+		}
+
+		.hero__title-img {
+			display: block;
+			width: 740px;
+			max-width: 100%;
+			height: auto;
+		}
+
+		.hero__title-line {
+			display: block;
+			font-weight: 300;
+			letter-spacing: -0.06em;
+		}
+
+		.hero__title-line--small {
+			font-size: 48px;
+			margin-bottom: 12px;
+		}
+
+		.hero__title-row {
+			display: flex;
+			align-items: flex-end;
+			gap: 4px;
+			flex-wrap: wrap;
+		}
+
+		.hero__title-box {
+			display: inline-flex;
+			align-items: center;
+			min-height: 96px;
+			padding: 0 8px;
+			border: 2px solid #050505;
+			box-sizing: border-box;
+			font-size: 80px;
+			font-weight: 500;
+			letter-spacing: -0.07em;
+			line-height: 1;
+		}
+
+		.hero__title-box--wide {
+			margin-bottom: 10px;
+		}
+
+		.hero__subtitle {
+			max-width: 440px;
+			margin: 56px 0 0 32px;
+			font-size: 24px;
+			font-weight: 500;
+			line-height: 1.15;
+			letter-spacing: -0.01em;
+			text-transform: capitalize;
+		}
+
+		.hero__scroll {
+			display: inline-flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 10px;
+			margin: auto 0 0 56px;
+			font-size: 24px;
+			font-weight: 300;
+			line-height: 1;
+			letter-spacing: 0.01em;
+			color: #050505;
+		}
+
+		.hero__arrow {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 24px;
+			height: 24px;
+			font-size: 24px;
+			line-height: 1;
+			transform: translateY(-1px);
+		}
+
+		.hero__arrow-icon {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+
+		#scrolly-sections {
+			position: relative;
+			z-index: 100;
+			margin-top: 0;
+			background: #fff;
+			opacity: 0;
+			pointer-events: none;
+			transition: opacity 0.25s ease;
+		}
+
+		body.menu-visible #scrolly-sections {
+			opacity: 1;
+			pointer-events: auto;
+		}
+
+		#infographic,
+		#content,
+		#compare {
+			position: relative;
+			display: grid;
+			grid-template-columns: 481px minmax(0, 1fr);
+			background: #fff;
+			min-height: 100vh;
+		}
+
+		#infographic article,
+		#content article,
+		#compare article {
+			width: 100%;
+			min-width: 0;
+			max-width: 481px;
+			outline: 0;
+			border-right: 1px solid #efefef;
+			background: #fff;
+			font-size: 20px;
+			padding: 149px 40px 40px 56px;
+			box-sizing: border-box;
+			position: relative;
+		}
+
+		#infographic figure,
+		#content figure,
+		#compare figure {
+			position: sticky;
+			top: 51px;
+			height: calc(100vh - 51px);
+			width: 100%;
+			min-width: 0;
+			background: #fff;
+			display: flex;
+			align-items: stretch;
+			justify-content: stretch;
+			font-size: 1rem;
+			margin-left: 0;
+			overflow: hidden;
+		}
+
+		#infographic .step,
+		#content .step,
+		#compare .step {
+			margin: 0;
+			padding: 0;
+			color: #050505;
+			outline: 0;
+			text-align: left;
+			height: 340vh;
+			display: flex;
+			align-items: flex-start;
+			line-height: 1.7;
+			max-width: 332px;
+		}
+
+		#infographic article {
+			z-index: 1;
+		}
+
+		#infographic figure {
+			z-index: 0;
+			background: transparent;
+		}
+
+		#infographic .step {
+			opacity: 0.45;
+			transition: opacity 0.2s ease;
+			overflow: visible;
+			position: relative;
+		}
+
+		#infographic .step.is-active {
+			opacity: 1;
+		}
+
+		.step-flow {
+			display: grid;
+			gap: 16px;
+			width: 100%;
+			position: sticky;
+			top: 132px;
+			align-self: flex-start;
+		}
+
+		.step-part {
+			display: block;
+			padding: 12px 14px;
+			background: #fff;
+			line-height: 1.55;
+			opacity: 0;
+			transform: translate3d(0, 22px, 0);
+			transition: opacity 0.35s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+		}
+
+		#infographic .infographic-title {
+			margin: 0 0 12px;
+			font-size: clamp(40px, 4.2vw, 50px);
+			line-height: 1.03;
+			font-weight: 700;
+			letter-spacing: -0.02em;
+			opacity: 0;
+			transform: translate3d(0, 22px, 0);
+			transition: opacity 0.35s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+		}
+
+		#infographic .step.concept-title-visible .infographic-title {
+			opacity: 1;
+			transform: translate3d(0, 0, 0);
+		}
+
+		#infographic .step.concept-part1-visible .step-flow .step-part--1 {
+			opacity: 1;
+			transform: translate3d(0, 0, 0);
+		}
+
+		#infographic .step.concept-part2-visible .step-flow .step-part--2 {
+			opacity: 1;
+			transform: translate3d(0, 0, 0);
+		}
+
+		#infographic .step.concept-part3-visible .step-flow .step-part--3 {
+			opacity: 1;
+			transform: translate3d(0, 0, 0);
+		}
+
+		.intro-model-shell {
+			position: absolute;
+			inset: 0;
+			display: flex;
+			width: 100%;
+			height: 100%;
+			padding: 0;
+			box-sizing: border-box;
+			background: #fff;
+		}
+
+		.chapter-progress {
+			position: absolute;
+			top: 0;
+			left: 481px;
+			width: 14px;
+			height: 100%;
+			transform: translateX(-50%);
+			pointer-events: none;
+			z-index: 5;
+		}
+
+		.chapter-progress-inner {
+			position: sticky;
+			top: 76px;
+			height: calc(100vh - 152px);
+		}
+
+		.chapter-progress-inner::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 50%;
+			width: 1px;
+			height: 100%;
+			transform: translateX(-50%);
+			background: rgba(5, 5, 5, 0.08);
+		}
+
+		.chapter-progress-segments {
+			display: none;
+		}
+
+		.chapter-progress-segment {
+			width: 100%;
+		}
+
+		.chapter-progress-thumb {
+			position: absolute;
+			top: 0;
+			left: 3px;
+			width: 8px;
+			height: 58px;
+			border-radius: 3px;
+			background: #a6a6a6;
+			box-shadow: 0 0 0 1px rgba(5, 5, 5, 0.02);
+			transform: translate3d(0, 0, 0);
+			will-change: transform;
+		}
+
+		#content .step:first-child,
+		#compare .step:first-child {
+			margin-top: 0;
+		}
+
+		#content .concept-flow,
+		#compare .concept-flow {
+			display: grid;
+			gap: 16px;
+			width: 100%;
+			position: sticky;
+			top: 132px;
+			align-self: flex-start;
+			opacity: 1;
+			transform: none;
+		}
+
+		#content .concept-title,
+		#compare .concept-title {
+			margin: 0 0 12px;
+			font-size: clamp(40px, 4.2vw, 50px);
+			line-height: 1.03;
+			font-weight: 700;
+			letter-spacing: -0.02em;
+			opacity: 0;
+			transform: translate3d(0, 22px, 0);
+			transition: opacity 0.35s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+		}
+
+		#content .concept-text-blocks,
+		#compare .concept-text-blocks {
+			display: grid;
+			gap: 14px;
+		}
+
+		#content .concept-text-blocks .step-part,
+		#compare .concept-text-blocks .step-part {
+			opacity: 0;
+			transform: translate3d(0, 22px, 0);
+			padding: 12px 14px;
+			border: 1px solid rgba(5, 5, 5, 0.42);
+			line-height: 1.55;
+			transition: opacity 0.35s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+		}
+
+		#content .step.concept-title-visible .concept-title,
+		#compare .step.concept-title-visible .concept-title {
+			opacity: 1;
+			transform: translate3d(0, 0, 0);
+		}
+
+		#content .step.concept-part1-visible .concept-text-blocks .step-part--1,
+		#compare .step.concept-part1-visible .concept-text-blocks .step-part--1 {
+			opacity: 1;
+			transform: translate3d(0, 0, 0);
+		}
+
+		#content .step.concept-part2-visible .concept-text-blocks .step-part--2,
+		#compare .step.concept-part2-visible .concept-text-blocks .step-part--2 {
+			opacity: 1;
+			transform: translate3d(0, 0, 0);
+		}
+
+		#content .step.concept-part3-visible .concept-text-blocks .step-part--3,
+		#compare .step.concept-part3-visible .concept-text-blocks .step-part--3 {
+			opacity: 1;
+			transform: translate3d(0, 0, 0);
+		}
+
+		#content .step.is-active,
+		#compare .step.is-active {
+			font-weight: 400;
+		}
+
+		.model-view {
+			position: absolute;
+			inset: 0;
+			display: flex;
+			width: 100%;
+			height: 100%;
+			padding: 112px 90px 72px;
+			box-sizing: border-box;
+			background: #fff;
+			color: black;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.2rem;
+			opacity: 0;
+			transition: opacity 0.35s ease;
+			pointer-events: none;
+		}
+
+		.model-view.active {
+			opacity: 1;
+		}
+
+		.model-view img {
+			width: 70%;
+			height: 70%;
+			object-fit: contain;
+			object-position: center center;
+		}
+
+		#content .model-view::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			pointer-events: none;
+		}
+
+		body::-webkit-scrollbar,
+		.Chapters::-webkit-scrollbar {
+			width: 10px;
+		}
+
+		body::-webkit-scrollbar-track,
+		.Chapters::-webkit-scrollbar-track {
+			background: #ededed;
+		}
+
+		body::-webkit-scrollbar-thumb,
+		.Chapters::-webkit-scrollbar-thumb {
+			background: #999;
+			border-radius: 999px;
+			border: 1px solid #ededed;
+		}
+
+		* {
+			scrollbar-width: thin;
+			scrollbar-color: #999 #ededed;
+		}
+
+		@media (max-width: 1446px) {
+			#intro.hero {
+				padding-right: 3.8vw;
+				padding-left: 3.8vw;
+			}
+		}
+
+		@media (max-width: 1297px) {
+			.hero__title-line--small {
+				font-size: 3.7vw;
+			}
+		}
+
+		@media (max-width: 1079px) {
+			.hero__inner {
+				flex-basis: 620px;
+			}
+
+			.hero__visual-shell {
+				left: 0;
+			}
+
+			body.menu-visible .hero__visual-shell {
+				left: 360px;
+			}
+
+			.header,
+			.Chapters {
+				width: 360px;
+			}
+
+			#infographic,
+			#content,
+			#compare {
+				grid-template-columns: 360px minmax(0, 1fr);
+			}
+
+			.chapter-progress {
+				left: 360px;
+			}
+
+			#infographic article,
+			#content article,
+			#compare article {
+				max-width: 360px;
+			}
+		}
+
+		@media (max-width: 999px) {
+			.hero__title-box {
+				min-height: 56px;
+			}
+		}
+
+		@media (max-width: 973px) {
+			.hero__title-line--small {
+				font-size: 36px;
+			}
+		}
+
+		@media (max-width: 830px) {
+			.hero__title-box {
+				font-size: 44px;
+			}
+		}
+
+		@media (max-width: 789px) {
+			.hero__logo {
+				margin-bottom: 19vh;
+			}
+		}
+
+		@media (max-width: 736px) {
+			#intro.hero {
+				padding-right: 28px;
+				padding-left: 28px;
+			}
+		}
+
+		@media (max-height: 789px) {
+			.hero__logo {
+				margin-bottom: 19vh;
+			}
+		}
+
+		@media (max-height: 578px) {
+			.hero__logo {
+				margin-bottom: 110px;
+			}
+		}
+
+		@media (max-width: 1714px) {
+			.hero__title-box {
+				min-height: 5.6vw;
+			}
+		}
+
+		@media (max-width: 1509px) {
+			.hero__title-box {
+				font-size: 5.3vw;
+			}
+		}
+
+		@media (max-width: 640px) {
+			.header {
+				width: 100vw;
+			}
+
+			.Chapters {
+				width: 100vw;
+				padding: 24px 32px;
+			}
+
+			.group-link {
+				min-width: 0;
+				max-width: 100%;
+			}
+
+			.item-link {
+				gap: 12px;
+				font-size: 18px;
+			}
+
+			.Dropdownbutton {
+				padding: 0 24px;
+			}
+
+			#intro {
+				padding: 24px 28px 40px;
+				background-image: linear-gradient(90deg, rgba(5, 5, 5, 0.035) 0, rgba(5, 5, 5, 0.035) 84px, transparent 84px);
+			}
+
+			#intro > * {
+				margin-left: 0;
+				margin-right: 0;
+			}
+
+			.hero__inner {
+				width: 100%;
+				flex: 1 1 auto;
+			}
+
+			.hero__visual-shell {
+				left: 0;
+			}
+
+			.hero__logo {
+				width: 86px;
+				min-height: 56px;
+				margin-bottom: 88px;
+			}
+
+			.hero__title {
+				margin-left: 0;
+			}
+
+			.hero__title-img {
+				width: 100%;
+				max-width: 420px;
+			}
+
+			.hero__title-line--small {
+				font-size: 40px;
+				margin-bottom: 10px;
+			}
+
+			.hero__title-box {
+				min-height: 54px;
+				padding: 0 10px;
+				font-size: 54px;
+			}
+
+			.hero__subtitle {
+				max-width: 320px;
+				margin-left: 0;
+				font-size: 18px;
+			}
+
+			.hero__scroll {
+				margin-left: 0;
+				margin-top: 56px;
+				font-size: 20px;
+			}
+
+			#infographic,
+			#content,
+			#compare {
+				grid-template-columns: 1fr;
+				min-height: auto;
+			}
+
+			#infographic article,
+			#content article,
+			#compare article {
+				max-width: none;
+				border-right: 0;
+				padding: 115px 32px 20px;
+			}
+
+			.chapter-progress {
+				display: none;
+			}
+
+			#infographic figure,
+			#content figure,
+			#compare figure {
+				position: relative;
+				top: 0;
+				height: 62vh;
+			}
+
+			.intro-model-shell {
+				padding: 0;
+			}
+
+			.model-view {
+				padding: 32px;
+			}
+
+			.hero__subtitle,
+			.hero__scroll,
+			#infographic .step,
+			#content .step,
+			#compare .step {
+				max-width: 100%;
+			}
+
+			.step-flow {
+				top: 96px;
+			}
+		}
+
+		@media (max-width: 568px) {
+			.hero__title-box {
+				font-size: 9.5vw;
+			}
+		}
+
+		@media (max-width: 513px) {
+			.hero__title-line--small {
+				font-size: 7.8vw;
+			}
+		}
+
+		@media (max-width: 358px) {
+			.hero__title-line--small {
+				font-size: 28px;
+			}
+
+			.hero__title-box {
+				font-size: 34px;
+			}
+		}
+
+		#outro {
+			height: 100vh;
+		}
+	</style>
+
+
+<body>
+
+<!--Header-->
+
+  <header class="header" id="headerDropdown">
+    <button class="Dropdownbutton">
+	<div class="menu" id="menuTitle">Introduction</div>
+
+		<div class="Dropdown">
+			<div class="openMenu">open</div>
+			<div class="closeMenu">close</div>
+			<div class="DropdownSymbol"></div>
+		</div>
+    </button>
+
+	    <div class="Chapters">
+			<div class="menu-group" data-group="introduction">
+				<a href="#intro" class="group-link" data-menu-group-link="introduction">Introduction</a>
+				<a href="#infographic" class="item-link" data-menu-item="system-boundaries">The Building Blocks Of A Neighbourhood</a>
+			</div>
+			<div class="menu-group" data-group="concept">
+				<a href="#content" class="group-link" data-menu-group-link="concept">Concept</a>
+				<a href="#content" class="item-link" data-menu-item="modular-approach">From Building Blocks to Scenarios</a>
+				<a href="#content" class="item-link" data-menu-item="key-factors">How Climate Impact Is Measured</a>
+			</div>
+			<div class="menu-group" data-group="compare">
+				<a href="#compare" class="group-link" data-menu-group-link="compare">Compare</a>
+				<a href="#compare" class="item-link" data-menu-item="case-1">Urban Form & Private Parking</a>
+			</div>
+	    </div>
+  </header>
+
+ <!--Section 0: Homepage-->
+
+	<main>
+		<section id="intro" class="hero" aria-label="Homepage hero">
+			<div class="hero__inner">
+				<div class="hero__logo" aria-label="QLCA logo">
+					<img class="hero__logo-img" src="./svgs/QLCA_Logo.svg" alt="QLCA logo">
+				</div>
+				<div class="hero__title" aria-label="The neighbourhood as a system">
+					<img class="hero__title-img" src="./svgs/HomepageTitle.svg" alt="The neighbourhood as a system">
+				</div>
+				<p class="hero__subtitle">
+					Exploring How Urban Design Choices<br>Shape Life Cycle Emissions
+				</p>
+				<div class="hero__scroll" aria-label="Scroll down">
+					<span>SCROLL</span>
+					<span class="hero__arrow" aria-hidden="true"><img class="hero__arrow-icon" src="./svgs/arrow.down.svg" alt=""></span>
+				</div>
+			</div>
+			<div class="hero__visual-shell" aria-hidden="true">
+				<div class="intro-model-shell">
+					<div class="hero__model-canvas" id="heroModelCanvas"></div>
+					<div class="hero__model-fallback" id="heroModelFallback"> Run this page through a local server to load and animate the 3D model.</div>
+				</div>
+			</div>
+		</section>
+
+
+<!--Section 1: Intro-->
+
+		<section id="scrolly-sections" aria-label="Scrollama storytelling sections">
+		<div id="infographic">
+			<article>
+				<!-- CAMERA SHOT 0 --> 
+				<div class="step">
+					<div class="step-flow">
+						<div class="step-part step-part--1">Life cycle assessments are well established for individual buildings, but their application at neighbourhood scale remains limited.</div>
+						<div class="step-part step-part--2">Infrastructure and planning interactions also influence environmental performance, yet they are often overlooked.</div>
+					</div>
+				</div>
+
+				<!-- CAMERA SHOT 1 --> 
+			 	<div class="step">
+					<div class="step-flow">
+						<div class="step-part step-part--1">The Quarter Life Cycle Assessment (Q-LCA) model addresses this gap with a modular structure.</div>
+						<div class="step-part step-part--2">It evaluates the Global Warming Potential (GWP) of entire residential neighbourhoods.</div>
+					</div>
+				</div>	
+				
+				<!-- CAMERA SHOT 2 --> 
+				<div class="step">
+					<div class="step-flow">
+					<h2 class="infographic-title">From Building Blocks to Scenarios</h2>
+						<div class="step-part step-part--1">Every neighbourhood begins with its buildings, including components, construction methods, and density.</div>
+						<div class="step-part step-part--2">However, buildings are only one part of the neighbourhood system.</div>
+					</div>
+				</div>
+
+				<!-- CAMERA SHOT 3 --> 
+				<div class="step">
+					<div class="step-flow">
+						<div class="step-part step-part--1">The neighbourhood structure is shaped by urban elements such as streets and parking areas.</div>
+						<div class="step-part step-part--2">Underground parking and circulation layouts also influence the overall system.</div>
+					</div>
+				</div>
+			
+				<!-- CAMERA SHOT 4 --> 
+				<div class="step">
+					<div class="step-flow">
+						<div class="step-part step-part--1">Another layer is formed by interconnected energy infrastructure across the district.</div>
+						<div class="step-part step-part--2">This includes electricity, utility lines, space heating, and warm water systems.</div>
+					</div>
+				</div>
+			
+				<!-- CAMERA SHOT 5 --> 
+				<div class="step">
+					<div class="step-flow">
+						<div class="step-part step-part--1">Finally, open spaces complete the neighbourhood system.</div>
+						<div class="step-part step-part--2">Green spaces and unbuilt areas are essential system components.</div>
+					</div>
+				</div>
+			
+				<!-- CAMERA SHOT 6 --> 
+				<div class="step">
+					<div class="step-flow">
+						<div class="step-part step-part--1">Together, these interconnected elements are assessed over a 50-year life cycle using the Q-LCA model.</div>
+						<div class="step-part step-part--2">This reveals their combined contribution to global warming potential.</div>
+					</div>
+				</div>
+			</article>
+
+			<figure aria-hidden="true"></figure>
+
+		</div>
+
+
+
+
+<!--Section 2: Concept-->
+
+	<div id="content">
+
+		<article>
+			<div class="step" data-chapter="concept">
+				<div class="concept-flow">
+					<h2 class="concept-title">From Building Blocks to Scenarios</h2>
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">To make the impact of different planning decisions visible, the <strong>Q-LCA model</strong> breaks down urban complexity into building blocks.</div>
+						<div class="step-part step-part--2">This allows global warming potential to be evaluated at neighbourhood scale.</div>
+					</div>
+				</div>
+			</div>
+			<div class="step" data-chapter="concept">
+				<div class="concept-flow">
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">The model starts with a standardised one-hectare unit as a basic building block.</div>
+					</div>
+				</div>
+			</div>
+			<div class="step" data-chapter="concept">
+				<div class="concept-flow">
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">These units can be combined to create a complete 6-hectare neighbourhood and explore different planning scenarios.</div>
+					</div>
+				</div>
+			</div>
+			<div class="step" data-chapter="concept">
+				<div class="concept-flow">
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">Each unit is defined by six key factors: Building type, Density, Road layout, Construction method, Heat supply and Energy efficiency level.</div>
+					</div>
+				</div>
+			</div>
+			<div class="step" data-chapter="concept">
+				<div class="concept-flow">
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">Each factor represents a specific planning decision. </div>
+						<div class="step-part step-part--2">For example, Building type describes the configuration of residential units and the overall building volume.</div>
+						<div class="step-part step-part--3">The factor Building type includes six possible typologies: block, line, point, row, duplex and single.</div>
+
+					</div>
+				</div>
+			</div>
+			<div class="step" data-chapter="concept">
+				<div class="concept-flow">
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">When combined with the factor Density, these choices already create 18 different settlement structures. </div>
+						<div class="step-part step-part--2">High, medium and low densities are the three possible values.</div>
+					</div>
+				</div>
+			</div>
+			<div class="step" data-chapter="concept">
+				<div class="concept-flow">
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">Adding Road layout introduces another layer of variation by including different ways of organising the street network, resulting in 54 possible combinations.</div>
+						<div class="step-part step-part--2">This factor distinguishes between grid, curve and cul-de-sac.</div>
+					</div>
+				</div>
+			</div>
+			<div class="step" data-chapter="concept">
+				<div class="concept-flow">
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">When the Construction method factor is added, with mineral and timber construction as possible values, the number of variations increases to 108.</div>
+					</div>
+				</div>
+			</div>
+			<div class="step" data-chapter="concept">
+				<div class="concept-flow">
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">Adding the Heat supply factor with the three possible values  natural gas, local energy and heat pumps results in 324 variations.</div>
+					</div>
+				</div>
+			</div>
+			<div class="step" data-chapter="concept">
+				<div class="concept-flow">
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">The final factor, Energy efficiency level , with values of 15, 30 and 70 kWh, expands the model to 972 possible neighbourhood variations, each of which can be evaluated based on its global warming potential.</div>
+					</div>
+				</div>
+			</div>
+			<div class="step" data-chapter="concept">
+				<div class="concept-flow">
+					<h2 class="concept-title">How Climate Impact is measured</h2>
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">The GWP of all 972 variations can be explored through different indicators, including total GWP as well as area-based and population-based metrics.</div>
+						<div class="step-part step-part--2">Comparing different configurations of urban patterns is therefore not only a matter of total global warming potential but also of spatial efficiency and per-capita resource use.</div>
+					</div>
+				</div>
+			</div>
+			<div class="step" data-chapter="concept">
+				<div class="concept-flow">
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">Changing selected urban development factors reveals shifts in environmental impact, including GWP hotspots and the contribution of different cost groups.</div>
+						<div class="step-part step-part--2">In the Q-LCA model, GWP is structured along the following cost groups:</div>
+						<div class="step-part step-part--3">Building (CG 300) <br> Building services (CG 400) <br> Infrastructure (CG 500) <br> Operational energy (B6) <br> *Including household electricity</div>
+					</div>
+				</div>
+			</div>
+
+		</article>
+
+		<div class="chapter-progress" aria-hidden="true">
+			<div class="chapter-progress-inner">
+				<div class="chapter-progress-segments" id="chapterProgressSegments"></div>
+				<div class="chapter-progress-thumb" id="chapterProgressThumb"></div>
+			</div>
+		</div>
+
+		<figure> 
+            <!--Model O as a starting page (?)-->
+            <div class="model-view active" id="model-0">
+            </div>
+            <div class="model-view" id="model-1">
+            <img src="./svgs/1_Hektar.svg" alt="Model 1">
+            </div>
+            <div class="model-view" id="model-2">
+                <img src="./svgs/6_Hektar.svg" alt="Model 2">
+            </div>
+			<div class="model-view" id="model-3">
+                <img src="./svgs/6KeyFactors.svg" alt="Model 3">
+            </div>
+            <div class="model-view" id="model-4">
+                <img src="./svgs/BuildingTypes.svg" alt="Model 4">
+            </div>
+        </figure>
+
+	</div>
+
+	<div id="compare">
+
+		<article>
+			<div class="step" data-chapter="compare">
+				<div class="concept-flow">
+					<h2 class="concept-title">The Model in Practice</h2>
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">The Q-LCA model connects neighbourhood design choices with life cycle impacts.</div>
+						<div class="step-part step-part--2">To see how the model works in practice, we explore one case in detail.</div>
+					</div>
+				</div>
+			</div>
+			<div class="step" data-chapter="compare">
+				<div class="concept-flow">
+					<h2 class="concept-title">Urban Form & Private Parking</h2>
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">This case compares two neighbourhoods with contrasting urban densities and typologies.</div>
+						<div class="step-part step-part--2">All other factors - road layout, construction method, heat supply and energy efficiency level - remain constant.</div>
+						<div class="step-part step-part--3">In addition, the case examines the influence of private parking infrastructure on global warming potential.</div>
+					</div>
+				</div>
+			</div>
+			<div class="step" data-chapter="compare">
+				<div class="concept-flow">
+					<h2 class="concept-title">Urban Form & Private Parking</h2>
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">The scenarios are represented at neighbourhood scale, using two six-hectare settlements.</div>
+					</div>
+				</div>
+			</div>
+			<div class="step" data-chapter="compare">
+				<div class="concept-flow">
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">Neighbourhood A represents a compact, high-density urban structure where land is used efficiently and urban functions are closely connected.</div>
+						<div class="step-part step-part--2">Most parking is provided underground to accommodate many vehicles within a limited area, requiring more complex construction and additional materials.</div>
+					</div>
+				</div>
+			</div>
+			<div class="step" data-chapter="compare">
+				<div class="concept-flow">
+					<div class="concept-text-blocks">
+						<div class="step-part step-part--1">Neighbourhood B represents a low-density suburban structure with detached housing, larger private spaces and more dispersed urban functions. </div>
+						<div class="step-part step-part--2">Its lower density requires more land per person, but creates more open and green spaces within the neighbourhood.</div>
+						<div class="step-part step-part--3">Parking is typically provided above ground.</div>
+					</div>
+				</div>
+			</div>
+
+
+		</article>
+		<figure aria-hidden="true"></figure>
+
+	</div>
+	</section>
+	<section id="outro"></section>
+
+	</main>
+	
+
+	<script src="./scrollama/d3.v7.min.js"></script>
+	<script src="./scrollama/scrollama.js"></script>
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "https://unpkg.com/three@0.149.0/build/three.module.js",
+				"three/": "https://unpkg.com/three@0.149.0/"
+			}
+		}
+	</script>
+	<script type="module">
+		import * as THREE from "three";
+		import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+
+		const heroModelCanvas = document.getElementById("heroModelCanvas");
+		const heroModelFallback = document.getElementById("heroModelFallback");
+
+		if (heroModelCanvas) {
+			const scene = new THREE.Scene();
+			const startWidth = heroModelCanvas.clientWidth || window.innerWidth;
+			const startHeight = heroModelCanvas.clientHeight || window.innerHeight;
+			const aspect = startWidth / startHeight;
+			const size = 4;
+			const camera = new THREE.OrthographicCamera(-size * aspect, size * aspect, size, -size, 1, 1000);
+			const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+			const loader = new GLTFLoader();
+			let modelRoot = null;
+
+
+
+			const shots = [ 
+			// Step 0 — Overview 
+			{ 
+				position: [20, 20, 20],
+				target: [0, 0, 0],
+				zoom: 1 }, 
+
+			// Step 1 — Left 
+			{ 
+				position: [20, 20, 20],
+				target: [-4, 0, 0],
+				zoom: 1.4 }, 
+			// Step 2 — Left / closer 
+			{ 
+				position: [20, 20, 20],
+				target: [-7, 0, 0],
+				zoom: 2 }, 
+
+			// Step 3 — Middle 
+			{ 
+				position: [20, 20, 20],
+				target: [0, 0, 0],
+				zoom: 2 }, 
+
+			// Step 4 — Right 
+			{ 
+				position: [20, 20, 20], 
+				target: [5, 0, 0], 
+				zoom: 2 }, 
+			// Step 5 — Right / closer 
+			{ 
+				position: [20, 20, 20], 
+				target: [7, 0, 0], 
+				zoom: 2.5 }, 
+			// Step 6 — Return to overview 
+			{ 
+				position: [20, 20, 20], 
+				target: [0, 0, 0], 
+				zoom: 1 } 
+			];
+			const cameraTarget = new THREE.Vector3();
+			const desiredCameraTarget = new THREE.Vector3();
+			const desiredCameraPosition = new THREE.Vector3();
+			let desiredCameraZoom = shots[0].zoom;
+			let cameraReady = false;
+
+			function setCameraState(position, target, zoom) {
+				desiredCameraPosition.set(position[0], position[1], position[2]);
+				desiredCameraTarget.set(target[0], target[1], target[2]);
+				desiredCameraZoom = zoom;
+			}
+
+			// Scroll progress continuously interpolates between neighbouring camera shots.
+			// requestAnimationFrame then eases the real Three.js camera toward that target.
+			function setIntroCamera(index, progress = 0) {
+				if (!shots[index]) return;
+
+				const from = shots[index];
+				const to = shots[Math.min(index + 1, shots.length - 1)] || from;
+				const t = Math.max(0, Math.min(1, progress));
+
+				setCameraState(
+					[
+						THREE.MathUtils.lerp(from.position[0], to.position[0], t),
+						THREE.MathUtils.lerp(from.position[1], to.position[1], t),
+						THREE.MathUtils.lerp(from.position[2], to.position[2], t)
+					],
+					[
+						THREE.MathUtils.lerp(from.target[0], to.target[0], t),
+						THREE.MathUtils.lerp(from.target[1], to.target[1], t),
+						THREE.MathUtils.lerp(from.target[2], to.target[2], t)
+					],
+					THREE.MathUtils.lerp(from.zoom, to.zoom, t)
+				);
+			}
+
+			window.setIntroCamera = setIntroCamera;
+
+			function animateCamera(deltaTime) {
+				const smoothing = 1 - Math.exp(-10 * deltaTime);
+				camera.position.lerp(desiredCameraPosition, smoothing);
+				cameraTarget.lerp(desiredCameraTarget, smoothing);
+				camera.zoom = THREE.MathUtils.lerp(camera.zoom, desiredCameraZoom, smoothing);
+				camera.lookAt(cameraTarget);
+				camera.updateProjectionMatrix();
+			}
+
+			renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+			renderer.outputColorSpace = THREE.SRGBColorSpace;
+			renderer.shadowMap.enabled = true;
+			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+			heroModelCanvas.appendChild(renderer.domElement);
+
+			camera.position.set(20, 20, 20);
+			cameraTarget.set(0, 0, 0);
+			camera.lookAt(cameraTarget);
+			setCameraState(shots[0].position, shots[0].target, shots[0].zoom);
+			cameraReady = true;
+
+			const material = new THREE.MeshPhongMaterial({
+				color: 0xc8c8c8,
+				flatShading: true,
+				shininess: 0,
+			});
+
+			const ambient = new THREE.HemisphereLight(0xffffff, 0x888888, 1.8);
+			scene.add(ambient);
+
+			const directional = new THREE.DirectionalLight(0xffffff, 2.0);
+			directional.position.set(5, 10, -2);
+			directional.castShadow = true;
+			scene.add(directional);
+
+			const ground = new THREE.Mesh(
+				new THREE.PlaneGeometry(200, 200),
+				new THREE.ShadowMaterial({ opacity: 0.15 })
+			);
+			ground.rotation.x = -Math.PI / 2;
+			ground.receiveShadow = true;
+			scene.add(ground);
+
+
+			let lastFrameTime = performance.now();
+
+			function animate() {
+				const now = performance.now();
+				const deltaTime = Math.min((now - lastFrameTime) / 1000, 0.05);
+				lastFrameTime = now;
+
+				if (cameraReady) animateCamera(deltaTime);
+				renderer.render(scene, camera);
+			}
+
+			loader.load(
+				"./Neighbourhood_Model/Intro.glb",
+				(gltf) => {
+					modelRoot = gltf.scene;
+					gltf.scene.scale.setScalar(1.15);
+					const modelBox = new THREE.Box3().setFromObject(gltf.scene);
+					const modelCenter = modelBox.getCenter(new THREE.Vector3());
+					gltf.scene.position.set(-modelCenter.x - -3, -modelCenter.y - -0.3, -modelCenter.z);
+
+					gltf.scene.traverse((child) => {
+						if (child.isMesh) {
+							child.material = material;
+
+							child.castShadow = true;
+							child.receiveShadow = true;
+						}
+					});
+
+					scene.add(gltf.scene);
+					renderer.render(scene, camera);
+				},
+				undefined,
+				() => {
+					if (heroModelFallback) {
+						heroModelFallback.style.display = "block";
+					}
+				}
+			);
+
+			function resizeRenderer() {
+				const width = heroModelCanvas.clientWidth || window.innerWidth;
+				const height = heroModelCanvas.clientHeight || window.innerHeight;
+				const nextAspect = width / height;
+				camera.left = -size * nextAspect;
+				camera.right = size * nextAspect;
+				camera.top = size;
+				camera.bottom = -size;
+				camera.updateProjectionMatrix();
+				renderer.setSize(width, height);
+			}
+
+			window.addEventListener("resize", () => {
+				resizeRenderer();
+			});
+
+			resizeRenderer();
+			renderer.setAnimationLoop(animate);
+		}
+	</script>
+	<script>
+
+	const dropdown = document.getElementById("headerDropdown");
+	const button = dropdown.querySelector(".Dropdownbutton");
+	const menuTitle = document.getElementById("menuTitle");
+	const menuGroupLinks = Array.from(document.querySelectorAll("[data-menu-group-link]"));
+	const menuItemLinks = Array.from(document.querySelectorAll("[data-menu-item]"));
+	const conceptStepItemMap = ["modular-approach", "modular-approach", "key-factors"];
+
+	function setMenuOpenState(isOpen) {
+		dropdown.classList.toggle("open", isOpen);
+		document.body.classList.toggle("menu-open", isOpen);
+	}
+
+	function updateMenuHighlight() {
+		let activeGroup = "introduction";
+		let activeItem = "system-boundaries";
+
+		const compareTop = compareSection.getBoundingClientRect().top;
+		const conceptTop = conceptSection.getBoundingClientRect().top;
+		if (compareTop <= 0) {
+			activeGroup = "compare";
+			activeItem = "case-1";
+		} else if (conceptTop <= 0) {
+			activeGroup = "concept";
+			activeItem = conceptStepItemMap[currentConceptStepIndex] || "key-factors";
+		}
+
+		menuGroupLinks.forEach((link) => {
+			link.classList.toggle("is-active", link.dataset.menuGroupLink === activeGroup);
+		});
+
+		menuItemLinks.forEach((link) => {
+			link.classList.toggle("is-active", link.dataset.menuItem === activeItem);
+		});
+
+		const activeGroupLink = menuGroupLinks.find((link) => link.dataset.menuGroupLink === activeGroup);
+		if (activeGroupLink) {
+			menuTitle.textContent = activeGroupLink.textContent.trim();
+		}
+	}
+
+	button.addEventListener("click", () => {
+		setMenuOpenState(!dropdown.classList.contains("open"));
+	});
+
+	dropdown.addEventListener("click", (e) => {
+    	const item = e.target.closest(".Chapters a");
+    	if (!item) return;
+
+		if (item.dataset.menuGroupLink) {
+			menuTitle.textContent = item.textContent.trim();
+		}
+	    	setMenuOpenState(false);
+	});
+
+	document.addEventListener("click", (e) => {
+   		if (!dropdown.contains(e.target)) {
+	        	setMenuOpenState(false);
+    	}
+	});
+
+	const main = d3.select("main");
+	const introScrolly = main.select("#infographic");
+	const introFigure = introScrolly.select("figure");
+	const introArticle = introScrolly.select("article");
+	const introStep = introArticle.selectAll(".step");
+
+	const conceptScrolly = main.select("#content");
+	const conceptFigure = conceptScrolly.select("figure");
+	const conceptArticle = conceptScrolly.select("article");
+	const conceptStep = conceptArticle.selectAll(".step");
+
+	const compareScrolly = main.select("#compare");
+	const compareFigure = compareScrolly.select("figure");
+	const compareArticle = compareScrolly.select("article");
+	const compareStep = compareArticle.selectAll(".step");
+
+	const heroVisualShell = document.querySelector(".hero__visual-shell");
+	const introSection = document.getElementById("infographic");
+	const conceptSection = document.getElementById("content");
+	const compareSection = document.getElementById("compare");
+
+// scrollbar
+	const progressThumb = document.getElementById("chapterProgressThumb");
+
+// models
+	const models = [
+		document.getElementById("model-0"),
+		document.getElementById("model-1"),
+		document.getElementById("model-2"),
+		document.getElementById("model-3"),
+		document.getElementById("model-4")
+	].filter(Boolean);
+
+// Scrollama
+	const introScroller = scrollama();
+	const conceptScroller = scrollama();
+	const compareScroller = scrollama();
+	const introFadeStart = 0.01;
+	const introFadeEnd = 0.62;
+	const CONCEPT_PART1_PROGRESS = 0.28;
+	const CONCEPT_PART2_PROGRESS = 0.56;
+	const CONCEPT_PART3_PROGRESS = 0.8;
+
+	let currentConceptStepIndex = 0;
+	let currentCompareStepIndex = 0;
+	let currentIntroOpacity = 1;
+	let currentIntroTextVisible = false;
+	let introProgressOrigin = null;
+	let currentIntroCameraIndex = -1;
+	let conceptSectionActive = false;
+
+	function syncIntroCamera(index, progress = 0) {
+		if (typeof window.setIntroCamera === "function") {
+			window.setIntroCamera(index, progress);
+			currentIntroCameraIndex = index;
+		}
+	}
+
+	function syncMenuState() {
+		updateMenuVisibility();
+		updateMenuHighlight();
+	}
+
+	function setActiveStep(stepSelection, index) {
+		stepSelection.classed("is-active", (d, i) => i === index);
+	}
+
+	function resetIntroFlowState() {
+		resetFlowState(introStep);
+	}
+
+	function updateIntroFlowFromProgress(stepEl, progress) {
+		if (!stepEl) return;
+		if (!stepEl.querySelector(".step-flow")) return;
+
+		stepEl.classList.add("concept-title-visible");
+		stepEl.classList.toggle("concept-part1-visible", progress >= CONCEPT_PART1_PROGRESS);
+		stepEl.classList.toggle("concept-part2-visible", progress >= CONCEPT_PART2_PROGRESS);
+		stepEl.classList.toggle("concept-part3-visible", progress >= CONCEPT_PART3_PROGRESS);
+	}
+
+	function resetFlowState(stepSelection) {
+		stepSelection.each(function () {
+			this.classList.remove("concept-title-visible", "concept-part1-visible", "concept-part2-visible", "concept-part3-visible");
+		});
+	}
+
+	function resetConceptFlowState() {
+		resetFlowState(conceptStep);
+	}
+
+	function resetCompareFlowState() {
+		resetFlowState(compareStep);
+	}
+
+	function updateConceptFlowFromProgress(stepEl, progress) {
+		if (!stepEl) return;
+		if (!stepEl.querySelector(".concept-flow")) return;
+
+		stepEl.classList.add("concept-title-visible");
+		stepEl.classList.toggle("concept-part1-visible", progress >= CONCEPT_PART1_PROGRESS);
+		stepEl.classList.toggle("concept-part2-visible", progress >= CONCEPT_PART2_PROGRESS);
+		stepEl.classList.toggle("concept-part3-visible", progress >= CONCEPT_PART3_PROGRESS);
+	}
+
+	function handleIntroStepEnter(response) {
+		const index = response.index;
+		syncIntroCamera(index, 0);
+		conceptSectionActive = false;
+
+		resetIntroFlowState();
+		setActiveStep(introStep, index);
+		if (index > 0) {
+			currentIntroOpacity = 0;
+			currentIntroTextVisible = true;
+			introProgressOrigin = null;
+			document.documentElement.style.setProperty("--intro-hero-opacity", "0");
+		} else {
+			currentIntroOpacity = 1;
+			currentIntroTextVisible = false;
+			introProgressOrigin = null;
+			document.documentElement.style.setProperty("--intro-hero-opacity", "1");
+		}
+		syncMenuState();
+	}
+
+	function updateIntroOverlayFade(response) {
+		// Link landing-page fade to Scrollama progress on the first intro step.
+		if (response.index > 0) {
+			currentIntroOpacity = 0;
+			introProgressOrigin = null;
+			document.documentElement.style.setProperty("--intro-hero-opacity", "0");
+			return;
+		}
+
+		if (window.scrollY <= 2) {
+			introProgressOrigin = response.progress;
+			currentIntroOpacity = 1;
+			document.documentElement.style.setProperty("--intro-hero-opacity", "1");
+			return;
+		}
+
+		if (introProgressOrigin === null) {
+			introProgressOrigin = response.progress;
+		}
+
+		const calibratedProgress = Math.max(0, response.progress - introProgressOrigin);
+
+		const normalized = (calibratedProgress - introFadeStart) / (introFadeEnd - introFadeStart);
+		const clamped = Math.max(0, Math.min(1, normalized));
+		const opacity = 1 - clamped;
+
+		currentIntroOpacity = opacity;
+		document.documentElement.style.setProperty("--intro-hero-opacity", opacity.toFixed(3));
+	}
+
+	function handleIntroStepProgress(response) {
+		syncIntroCamera(response.index, response.progress);
+		updateThreeJSFromScroll(response);
+		updateIntroOverlayFade(response);
+
+		let introTextProgress = response.progress;
+		if (response.index === 0) {
+			// Keep intro text fully inactive on camera shot 0.
+			// Text reveal starts only once shot 1 (left camera position) becomes active.
+			introTextProgress = 0;
+		}
+
+		currentIntroTextVisible = response.index > 0 || introTextProgress >= CONCEPT_PART1_PROGRESS;
+		conceptSectionActive = false;
+
+		setActiveStep(introStep, response.index);
+
+		updateIntroFlowFromProgress(response.element, introTextProgress);
+
+		syncMenuState();
+	}
+
+	function handleStepEnter(response) {
+		const index = response.index;
+		const modelIndex = Math.min(index + 1, models.length - 1);
+		currentConceptStepIndex = index;
+		conceptSectionActive = true;
+
+		setActiveStep(conceptStep, index);
+		resetConceptFlowState();
+		updateConceptFlowFromProgress(response.element, 0);
+		models.forEach((model) => {
+			model.classList.remove("active");
+		});
+		models[modelIndex].classList.add("active");
+
+		updateChapterProgress(response);
+		syncMenuState();
+	}
+
+	function handleStepProgress(response) {
+		currentConceptStepIndex = response.index;
+		conceptSectionActive = true;
+		setActiveStep(conceptStep, response.index);
+		updateConceptFlowFromProgress(response.element, response.progress);
+
+		// Keep the right-side model in sync even during continuous progress updates.
+		const modelIndex = Math.min(response.index + 1, models.length - 1);
+		models.forEach((model) => {
+			model.classList.remove("active");
+		});
+		models[modelIndex].classList.add("active");
+
+		updateChapterProgress(response);
+		syncMenuState();
+	}
+
+	function handleCompareStepEnter(response) {
+		currentCompareStepIndex = response.index;
+		conceptSectionActive = true;
+
+		setActiveStep(compareStep, response.index);
+		resetCompareFlowState();
+		updateConceptFlowFromProgress(response.element, 0);
+
+		syncMenuState();
+	}
+
+	function handleCompareStepProgress(response) {
+		currentCompareStepIndex = response.index;
+		conceptSectionActive = true;
+
+		setActiveStep(compareStep, response.index);
+		updateConceptFlowFromProgress(response.element, response.progress);
+
+		syncMenuState();
+	}
+
+	function updateChapterProgress(response) {
+		if (!progressThumb) return;
+
+		// Convert current step + in-step progress into one overall 0..1 value.
+		const totalSteps = conceptStep.size();
+		const overallProgress = (response.index + response.progress) / totalSteps;
+		const totalTravel = progressThumb.parentElement.offsetHeight - progressThumb.offsetHeight;
+		const y = totalTravel * overallProgress;
+
+		progressThumb.style.transform = `translate3d(0, ${Math.round(y)}px, 0)`;
+	}
+
+	function updateThreeJSFromScroll(response) {
+		// Camera movement is handled by setIntroCamera(index, progress).
+	}
+
+	function handleResize() {
+		// Layout sizing is handled by CSS; resize only keeps scroll calculations in sync.
+		syncMenuState();
+		introScroller.resize();
+		conceptScroller.resize();
+		compareScroller.resize();
+	}
+
+	function updateMenuVisibility() {
+		if (!introSection) return;
+
+		const sectionRect = introSection.getBoundingClientRect();
+		const menuShouldShow = window.scrollY > 2 && sectionRect.top <= 0 && currentIntroOpacity <= 0.08;
+		const conceptTop = conceptSection.getBoundingClientRect().top;
+		const contentActive = conceptSectionActive || conceptTop <= 0;
+
+		document.body.classList.toggle("menu-visible", menuShouldShow);
+		document.body.classList.toggle("content-active", contentActive);
+
+		if (heroVisualShell) {
+			if (contentActive) {
+				heroVisualShell.style.display = "none";
+			} else {
+				heroVisualShell.style.display = "";
+				heroVisualShell.style.opacity = "";
+				heroVisualShell.style.visibility = "";
+			}
+		}
+	}
+
+	function init() {
+		currentIntroOpacity = 1;
+		currentIntroTextVisible = false;
+		introProgressOrigin = null;
+		currentIntroCameraIndex = -1;
+		document.documentElement.style.setProperty("--intro-hero-opacity", "1");
+
+		handleResize();
+		syncMenuState();
+
+		introScroller
+			.setup({
+				step: "#infographic article .step",
+				offset: 0.5,
+				progress: true,
+				debug: false
+			})
+			.onStepEnter(handleIntroStepEnter)
+			.onStepProgress(handleIntroStepProgress);
+
+		conceptScroller
+			.setup({
+				step: "#content article .step",
+				offset: 0.33,
+				progress: true,
+				debug: false
+			})
+			.onStepEnter(handleStepEnter)
+			.onStepProgress(handleStepProgress);
+
+		compareScroller
+			.setup({
+				step: "#compare article .step",
+				offset: 0.33,
+				progress: true,
+				debug: false
+			})
+			.onStepEnter(handleCompareStepEnter)
+			.onStepProgress(handleCompareStepProgress);
+
+		requestAnimationFrame(() => {
+			syncMenuState();
+		});
+	}
+
+	init();
+
+	window.addEventListener("resize", handleResize);
+	window.addEventListener("scroll", () => {
+		syncMenuState();
+	}, { passive: true });
+
+</script>
+
+</body>
+</html>
